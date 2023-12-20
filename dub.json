@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"yeti0904"
+	],
+	"copyright": "Copyright © 2023, yeti0904",
+	"description": "An RPN programming language",
+	"license": "MIT",
+	"name": "quart"
+}

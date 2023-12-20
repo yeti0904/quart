@@ -1,0 +1,17 @@
+: cr 10 emit ;
+: not 0 = ;
+: cells 8 * ;
+
+array myArray 5
+
+1 myArray !
+2 myArray 1 cells + !
+3 myArray 2 cells + !
+4 myArray 3 cells + !
+5 myArray 4 cells + !
+
+0
+begin
+	dup cells myArray + @ . cr
+	1 +
+dup 5 = not while

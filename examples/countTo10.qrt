@@ -1,0 +1,7 @@
+: not 0 = ;
+
+1
+begin
+	dup .
+	1 +
+dup 11 = not while
