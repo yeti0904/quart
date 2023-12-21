@@ -139,6 +139,9 @@ class Environment {
 				if (Pop() != 0) {
 					InterpretNodes(node.contents);
 				}
+				else if (!node.elseBlock.empty) {
+					InterpretNodes(node.elseBlock);
+				}
 				break;
 			}
 			case NodeType.While: {
@@ -163,6 +166,11 @@ class Environment {
 			case NodeType.String: {
 				auto node  = cast(StringNode) pnode;
 				dataStack ~= cast(long) (node.value.idup.toStringz());
+				break;
+			}
+			case NodeType.Bytes: {
+				auto node = cast(BytesNode) pnode;
+				variables[$ - 1][node.name] = (new ubyte[](node.size)).ptr;
 				break;
 			}
 			default: assert(0);

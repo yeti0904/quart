@@ -1,5 +1,6 @@
 module quart.backends.rm86;
 
+import std.range;
 import std.format;
 import quart.compiler;
 
@@ -94,10 +95,18 @@ class BackendRM86 : CompilerBackend {
 			"sub si, 2\n" ~
 			"mov ax, [si]\n" ~
 			"cmp ax, 0\n" ~
-			format("je __statement_end_%d\n", statement);
+			format("je __statement_else_%d\n", statement);
 
 		foreach (ref inode ; node.contents) {
 			ret ~= compiler.Compile(inode);
+		}
+		ret ~= format("jmp __statement_end_%d\n", statement);
+		ret ~= format("__statement_else_%d:\n", statement);
+
+		if (!node.elseBlock.empty) {
+			foreach (ref inode ; node.elseBlock) {
+				ret ~= compiler.Compile(inode);
+			}
 		}
 
 		return ret ~ format("__statement_end_%d:\n", statement);

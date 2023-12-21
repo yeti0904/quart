@@ -3,6 +3,7 @@ module quart.parser;
 import std.conv;
 import std.stdio;
 import std.format;
+import std.algorithm;
 import quart.util;
 import quart.lexer;
 import quart.error;
@@ -16,7 +17,8 @@ enum NodeType {
 	While,
 	Variable,
 	Array,
-	String
+	String,
+	Bytes
 }
 
 class Node {
@@ -74,6 +76,8 @@ class WordDefNode : BodyNode {
 }
 
 class IfNode : BodyNode {
+	Node[] elseBlock;
+
 	this(ErrorInfo pinfo) {
 		type = NodeType.If;
 		info = pinfo;
@@ -147,6 +151,20 @@ class StringNode : Node {
 	}
 }
 
+class BytesNode : Node {
+	string name;
+	size_t size;
+
+	this(ErrorInfo pinfo) {
+		type = NodeType.Bytes;
+		info = pinfo;
+	}
+
+	override string toString() {
+		return format("array %s %d", name, size);
+	}
+}
+
 class ParserError : Exception {
 	this() {
 		super("", "", 0);
@@ -202,6 +220,26 @@ class Parser {
 		return ret;
 	}
 
+	Node[] ParseUntilOne(string[] words, string* res) {
+		Node[] ret;
+
+		while (true) {
+			Next();
+
+			if (
+				(tokens[i].type == TokenType.Word) &&
+				words.canFind(tokens[i].contents)
+			) {
+				*res = tokens[i].contents;
+				break;
+			}
+
+			ret ~= ParseStatement();
+		}
+
+		return ret;
+	}
+
 	Node ParseWordDef() {
 		auto ret = new WordDefNode(GetError());
 
@@ -214,8 +252,14 @@ class Parser {
 	}
 
 	Node ParseIf() {
-		auto ret     = new IfNode(GetError());
-		ret.contents = ParseUntil("endif");
+		auto   ret = new IfNode(GetError());
+		string res;
+		ret.contents = ParseUntilOne(["endif", "else"], &res);
+
+		if (res == "else") {
+			ret.elseBlock = ParseUntil("endif");
+		}
+		
 		return ret;
 	}
 
@@ -244,6 +288,17 @@ class Parser {
 		return ret;
 	}
 
+	Node ParseBytes() {
+		auto ret = new BytesNode(GetError());
+		Next();
+		Expect(TokenType.Word);
+		ret.name = tokens[i].contents;
+		Next();
+		Expect(TokenType.Integer);
+		ret.size = parse!size_t(tokens[i].contents);
+		return ret;
+	}
+
 	Node ParseStatement() {
 		switch (tokens[i].type) {
 			case TokenType.Word: {
@@ -253,6 +308,7 @@ class Parser {
 					case "begin":    return ParseWhile();
 					case "variable": return ParseVariable();
 					case "array":    return ParseArray();
+					case "bytes":    return ParseBytes();
 					default: {
 						auto ret = new WordNode(GetError());
 						ret.word = tokens[i].contents;
