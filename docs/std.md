@@ -126,12 +126,12 @@ Swaps the top 2 items on the stack
 
 Pushes the second to top value on the stack
 
-## `rot`
+## rot
 `( n1 n2 n3 -- n2 n3 n1)`
 
 Rotates the top 3 stack entries
 
-## `drop`
+## drop
 `( n -- )`
 
 Removes the top value on the stack
