@@ -110,8 +110,8 @@ Word[string] GetBuiltIns() {
 	ret["swap"] = Word(true, (Environment env) {
 		auto n2 = env.Pop();
 		auto n1 = env.Pop();
-		env.Push(n1);
 		env.Push(n2);
+		env.Push(n1);
 	});
 	ret["over"] = Word(true, (Environment env) {
 		auto n2 = env.Pop();

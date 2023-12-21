@@ -1,0 +1,17 @@
+: print_num . 10 emit ;
+: not 0 = ;
+
+: fib
+	dup 1 = if
+		drop 0
+	else dup 2 = if
+		drop 1
+	else
+		dup 1 - fib swap 2 - fib +
+	endif endif
+;
+
+1 begin
+	dup fib print_num
+	1 +
+dup 13 = not while
