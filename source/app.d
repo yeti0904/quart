@@ -6,6 +6,8 @@ import std.array;
 import std.stdio;
 import quart.lexer;
 import quart.parser;
+import quart.compiler;
+import quart.backends.rm86;
 import quart.interpreter.environment;
 
 enum AppMode {
@@ -19,16 +21,16 @@ const string[] appUsage = [
 	"Usage:",
 	"    %s <FILE> <FLAGS>",
 	"Flags:",
-	"    -i : Interpret the given file",
-	"    -c : Compile the given file",
-	"    -r : Opens a REPL (no input file required)",
-	"    -t <TARGET> : Set target architecture (Available: y16)"
+	"    -i           : Interpret the given file",
+	"    -c           : Compile the given file",
+	"    -r           : Opens a REPL (no input file required)",
+	"    -b <BACKEND> : Set compiler backend (Available: rm86)"
 ];
 
 int main(string[] args) {
 	auto   mode = AppMode.None;
 	string inFile;
-	string arch = "y16";
+	string arch = "rm86";
 
 	if (args.length == 0) {
 		stderr.writeln("what");
@@ -54,7 +56,7 @@ int main(string[] args) {
 					mode = AppMode.Repl;
 					break;
 				}
-				case "-t": {
+				case "-b": {
 					++ i; // TODO: error if no parameter
 					arch = args[i];
 					break;
@@ -118,8 +120,54 @@ int main(string[] args) {
 			return 0;
 		}
 		case AppMode.Compile: {
-			stderr.writeln("Compiler not implemented yet");
-			return 1;
+			lexer.file = inFile;
+
+			try {
+				lexer.code = readText(inFile);
+			}
+			catch (FileException e) {
+				stderr.writefln("Error reading file: %s", e.msg);
+				return 1;
+			}
+			catch (UTFException e) {
+				stderr.writefln("Error reading file: %s", e.msg);
+				return 1;
+			}
+
+			lexer.Lex();
+			parser.tokens = lexer.tokens;
+
+			try {
+				parser.Parse();
+			}
+			catch (ParserError) {
+				return 1;
+			}
+
+			auto compiler = new Compiler();
+
+			switch (arch) {
+				case "rm86": {
+					compiler.backend = new BackendRM86();
+					break;
+				}
+				default: {
+					stderr.writefln("Error: no such backend '%s'", arch);
+					return 1;
+				}
+			}
+
+			string res;
+
+			try {
+				res = compiler.CompileProgram(parser.ast);
+			}
+			catch (CompilerError) {
+				return 1;
+			}
+			
+			writeln(res);
+			return 0;
 		}
 		case AppMode.Repl: {
 			writeln("Quart REPL");
