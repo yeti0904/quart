@@ -97,6 +97,36 @@ Word[string] GetBuiltIns() {
 	ret["cells"] = Word(true, (Environment env) {
 		env.Push(env.Pop() * 8);
 	});
+	ret["r>"] = Word(true, (Environment env) {
+		env.Push(env.PopReturn());
+	});
+	ret[">r"] = Word(true, (Environment env) {
+		env.PushReturn(env.Pop());
+	});
+	ret["swap"] = Word(true, (Environment env) {
+		auto n2 = env.Pop();
+		auto n1 = env.Pop();
+		env.Push(n1);
+		env.Push(n2);
+	});
+	ret["over"] = Word(true, (Environment env) {
+		auto n2 = env.Pop();
+		auto n1 = env.Pop();
+		env.Push(n1);
+		env.Push(n2);
+		env.Push(n1);
+	});
+	ret["rot"] = Word(true, (Environment env) {
+		auto n3 = env.Pop();
+		auto n2 = env.Pop();
+		auto n1 = env.Pop();
+		env.Push(n2);
+		env.Push(n3);
+		env.Push(n1);
+	});
+	ret["drop"] = Word(true, (Environment env) {
+		env.Pop();
+	});
 
 	return ret;
 }

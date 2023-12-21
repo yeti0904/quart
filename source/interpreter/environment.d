@@ -25,7 +25,7 @@ class Environment {
 	Word[string]    words;
 	void*[string][] variables;
 	long[]          dataStack;
-	long[]          callStack;
+	long[]          returnStack;
 	ErrorInfo       info;
 
 	this() {
@@ -71,6 +71,20 @@ class Environment {
 
 	void Push(long value) {
 		dataStack ~= value;
+	}
+
+	long PopReturn() {
+		if (returnStack.empty) {
+			Error("Return stack underflow");
+		}
+
+		auto ret    = returnStack[$ - 1];
+		returnStack = returnStack[0 .. $ - 1];
+		return ret;
+	}
+
+	void PushReturn(long value) {
+		returnStack ~= value;
 	}
 
 	void InterpretNode(Node pnode) {
