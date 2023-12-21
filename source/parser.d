@@ -147,6 +147,12 @@ class StringNode : Node {
 	}
 }
 
+class ParserError : Exception {
+	this() {
+		super("", "", 0);
+	}
+}
+
 class Parser {
 	Token[] tokens;
 	size_t  i;
@@ -177,7 +183,7 @@ class Parser {
 	void Error(Char, A...)(in Char[] fmt, A args) {
 		ErrorBegin(GetError());
 		stderr.writeln(format(fmt, args));
-		exit(1);
+		throw new ParserError();
 	}
 
 	Node[] ParseUntil(string word) {

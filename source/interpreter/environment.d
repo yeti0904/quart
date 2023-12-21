@@ -15,6 +15,12 @@ struct Word {
 	Node[]                     def;
 }
 
+class EnvironmentError : Exception {
+	this() {
+		super("", "", 0);
+	}
+}
+
 class Environment {
 	Word[string]    words;
 	void*[string][] variables;
@@ -42,7 +48,7 @@ class Environment {
 	void Error(Char, A...)(in Char[] fmt, A args) {
 		ErrorBegin(info);
 		stderr.writeln(format(fmt, args));
-		exit(1);
+		throw new EnvironmentError();
 	}
 
 	long Pop() {

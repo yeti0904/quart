@@ -101,9 +101,20 @@ int main(string[] args) {
 
 			lexer.Lex();
 			parser.tokens = lexer.tokens;
-			parser.Parse();
-			
-			env.InterpretNodes(parser.ast);
+
+			try {
+				parser.Parse();
+			}
+			catch (ParserError) {
+				return 1;
+			}
+
+			try {
+				env.InterpretNodes(parser.ast);
+			}
+			catch (EnvironmentError) {
+				return 1;
+			}
 			return 0;
 		}
 		case AppMode.Compile: {
@@ -124,9 +135,21 @@ int main(string[] args) {
 
 				lexer.Lex();
 				parser.tokens = lexer.tokens;
-				parser.Parse();
 
-				env.InterpretNodes(parser.ast);
+				try {
+					parser.Parse();
+				}
+				catch (ParserError) {
+					continue;
+				}
+
+				try {
+					env.InterpretNodes(parser.ast);
+				}
+				catch (EnvironmentError) {
+					continue;
+				}
+				
 				writeln("\nok");
 			}
 		}
