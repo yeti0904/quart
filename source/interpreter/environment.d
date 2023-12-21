@@ -87,6 +87,14 @@ class Environment {
 		returnStack ~= value;
 	}
 
+	void NewScope() {
+		variables ~= new void*[string];
+	}
+
+	void RemoveScope() {
+		variables = variables[0 .. $ - 1];
+	}
+
 	void InterpretNode(Node pnode) {
 		info = pnode.info;
 

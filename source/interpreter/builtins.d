@@ -62,10 +62,13 @@ Word[string] GetBuiltIns() {
 		env.Push(lhs <= rhs? -1 : 0);
 	});
 	ret["words"] = Word(true, (Environment env) {
+		size_t amount;
 		foreach (key, value ; env.words) {
 			writef("%s ", key);
+			++ amount;
 		}
 		writeln();
+		writefln("%d words", amount);
 	});
 	ret["emit"] = Word(true, (Environment env) {
 		writef("%c", cast(char) env.Pop());
@@ -77,6 +80,7 @@ Word[string] GetBuiltIns() {
 		env.Push(*(cast(long*) env.Pop()));
 	});
 	ret["!"] = Word(true, (Environment env) {
+		// TODO: is this guaranteed to run left to right
 		*(cast(long*) env.Pop()) = env.Pop();
 	});
 	ret["C@"] = Word(true, (Environment env) {
