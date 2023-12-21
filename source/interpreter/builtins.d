@@ -94,6 +94,9 @@ Word[string] GetBuiltIns() {
 	ret["type"] = Word(true, (Environment env) {
 		writef("%s", (cast(char*) env.Pop()).fromStringz());
 	});
+	ret["cells"] = Word(true, (Environment env) {
+		env.Push(env.Pop() * 8);
+	});
 
 	return ret;
 }

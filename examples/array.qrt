@@ -1,6 +1,5 @@
 : cr 10 emit ;
 : not 0 = ;
-: cells 8 * ;
 
 array myArray 5
 
