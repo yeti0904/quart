@@ -5,7 +5,8 @@ import std.string;
 enum TokenType {
 	Null,
 	Word,
-	Integer
+	Integer,
+	String
 }
 
 struct Token {
@@ -23,6 +24,7 @@ class Lexer {
 	size_t  line;
 	size_t  col;
 	string  file;
+	bool    inString;
 
 	this() {
 		
@@ -55,14 +57,45 @@ class Lexer {
 				++ col;
 			}
 
-			switch (code[i]) {
-				case '\t':
-				case '\n':
-				case ' ': {
-					AddReading();
-					break;
+			if (inString) {
+				switch (code[i]) {
+					case '"': {
+						inString = false;
+						AddToken(TokenType.String);
+						break;
+					}
+					default: reading ~= code[i];
 				}
-				default: reading ~= code[i];
+			}
+			else {
+				switch (code[i]) {
+					case '#': {
+						while ((i < code.length) && (code[i] != '\n')) {
+							++ i;
+
+							if (code[i] == '\n') {
+								++ line;
+								col = 0;
+							}
+							else {
+								++ col;
+							}
+						}
+						break;
+					}
+					case '"': {
+						AddReading();
+						inString = true;
+						break;
+					}
+					case '\t':
+					case '\n':
+					case ' ': {
+						AddReading();
+						break;
+					}
+					default: reading ~= code[i];
+				}
 			}
 		}
 

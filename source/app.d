@@ -11,7 +11,8 @@ import quart.interpreter.environment;
 enum AppMode {
 	None,
 	Interpret,
-	Compile
+	Compile,
+	Repl
 }
 
 const string[] appUsage = [
@@ -20,6 +21,7 @@ const string[] appUsage = [
 	"Flags:",
 	"    -i : Interpret the given file",
 	"    -c : Compile the given file",
+	"    -r : Opens a REPL (no input file required)",
 	"    -t <TARGET> : Set target architecture (Available: y16)"
 ];
 
@@ -46,6 +48,10 @@ int main(string[] args) {
 				}
 				case "-c": {
 					mode = AppMode.Compile;
+					break;
+				}
+				case "-r": {
+					mode = AppMode.Repl;
 					break;
 				}
 				case "-t": {
@@ -77,7 +83,9 @@ int main(string[] args) {
 			return 0;
 		}
 		case AppMode.Interpret: {
-			auto env    = new Environment();
+			auto env = new Environment();
+
+			lexer.file = inFile;
 
 			try {
 				lexer.code = readText(inFile);
@@ -101,6 +109,26 @@ int main(string[] args) {
 		case AppMode.Compile: {
 			stderr.writeln("Compiler not implemented yet");
 			return 1;
+		}
+		case AppMode.Repl: {
+			writeln("Quart REPL");
+			auto env = new Environment();
+
+			while (true) {
+				lexer  = new Lexer();
+				parser = new Parser();
+
+				writef("> ");
+				lexer.code = readln();
+				lexer.file = "<stdin>";
+
+				lexer.Lex();
+				parser.tokens = lexer.tokens;
+				parser.Parse();
+
+				env.InterpretNodes(parser.ast);
+				writeln("\nok");
+			}
 		}
 	}
 }

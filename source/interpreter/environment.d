@@ -3,6 +3,7 @@ module quart.interpreter.environment;
 import std.range;
 import std.stdio;
 import std.format;
+import std.string;
 import quart.util;
 import quart.error;
 import quart.parser;
@@ -129,6 +130,11 @@ class Environment {
 			case NodeType.Array: {
 				auto node = cast(ArrayNode) pnode;
 				variables[$ - 1][node.name] = (new long[](node.size)).ptr;
+				break;
+			}
+			case NodeType.String: {
+				auto node  = cast(StringNode) pnode;
+				dataStack ~= cast(long) (node.value.idup.toStringz());
 				break;
 			}
 			default: assert(0);

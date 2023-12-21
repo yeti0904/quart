@@ -4,12 +4,14 @@
 
 array myArray 5
 
+# write data to the array
 1 myArray !
 2 myArray 1 cells + !
 3 myArray 2 cells + !
 4 myArray 3 cells + !
 5 myArray 4 cells + !
 
+# print elements in the array
 0
 begin
 	dup cells myArray + @ . cr

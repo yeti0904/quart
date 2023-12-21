@@ -15,7 +15,8 @@ enum NodeType {
 	If,
 	While,
 	Variable,
-	Array
+	Array,
+	String
 }
 
 class Node {
@@ -133,6 +134,19 @@ class ArrayNode : Node {
 	}
 }
 
+class StringNode : Node {
+	string value;
+
+	this(ErrorInfo pinfo) {
+		type = NodeType.String;
+		info = pinfo;
+	}
+
+	override string toString() {
+		return format("\"%s\"", value);
+	}
+}
+
 class Parser {
 	Token[] tokens;
 	size_t  i;
@@ -243,6 +257,11 @@ class Parser {
 			case TokenType.Integer: {
 				auto ret  = new IntegerNode(GetError());
 				ret.value = parse!long(tokens[i].contents);
+				return ret;
+			}
+			case TokenType.String: {
+				auto ret  = new StringNode(GetError());
+				ret.value = tokens[i].contents;
 				return ret;
 			}
 			default: assert(0);
