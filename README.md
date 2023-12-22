@@ -22,6 +22,6 @@ Compiler:
 - [X] Word definitions
 - [X] If
 - [X] While
-- [ ] Variables
-- [ ] Arrays
+- [X] Variables
+- [X] Arrays
 - [ ] Strings
