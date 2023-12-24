@@ -2,9 +2,12 @@ module quart.compiler;
 
 import std.stdio;
 import std.format;
+import quart.util;
 import quart.error;
 
 public import quart.parser;
+
+private static const auto stdLib = cast(string) import("std/std.qrt");
 
 class CompilerError : Exception {
 	this() {
@@ -77,6 +80,17 @@ class Compiler {
 	string CompileProgram(Node[] nodes) {
 		backend.compiler = this;
 		string ret       = backend.Init();
+
+		Node[] stdNodes;
+
+		try {
+			stdNodes = ParseCode("<std lib>", stdLib);
+		}
+		catch (ParserError) throw new CompilerError();
+
+		foreach (ref node ; stdNodes) {
+			ret ~= Compile(node);
+		}
 
 		foreach (ref node ; nodes) {
 			ret ~= Compile(node);
