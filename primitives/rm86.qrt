@@ -117,6 +117,14 @@ endasm ;
 	int 0x10
 endasm ;
 
+: dup asm
+	sub si, 2 \
+	mov ax, [si] \
+	add si, 2 \
+	mov [si], ax \
+	add si, 2
+endasm ;
+
 : @ asm
 	sub si, 2 \
 	mov di, [si] \
