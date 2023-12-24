@@ -18,7 +18,8 @@ enum NodeType {
 	Variable,
 	Array,
 	String,
-	Bytes
+	Bytes,
+	Asm
 }
 
 class Node {
@@ -165,6 +166,19 @@ class BytesNode : Node {
 	}
 }
 
+class AsmNode : Node {
+	string contents;
+
+	this(ErrorInfo pinfo) {
+		type = NodeType.Asm;
+		info = pinfo;
+	}
+
+	override string toString() {
+		return format("asm %s endasm", contents);
+	}
+}
+
 class ParserError : Exception {
 	this() {
 		super("", "", 0);
@@ -299,6 +313,25 @@ class Parser {
 		return ret;
 	}
 
+	Node ParseAsm() {
+		auto ret = new AsmNode(GetError());
+
+		Next();
+
+		while (tokens[i].contents != "endasm") {
+			if (tokens[i].contents == "\\") {
+				ret.contents ~= '\n';
+			}
+			else {
+				ret.contents ~= tokens[i].contents ~ ' ';
+			}
+			
+			Next();
+		}
+
+		return ret;
+	}
+
 	Node ParseStatement() {
 		switch (tokens[i].type) {
 			case TokenType.Word: {
@@ -309,6 +342,7 @@ class Parser {
 					case "variable": return ParseVariable();
 					case "array":    return ParseArray();
 					case "bytes":    return ParseBytes();
+					case "asm":      return ParseAsm();
 					default: {
 						auto ret = new WordNode(GetError());
 						ret.word = tokens[i].contents;

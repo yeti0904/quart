@@ -32,6 +32,8 @@ class CompilerBackend {
 	abstract string CompileVariable(VariableNode);
 	abstract string CompileArray(ArrayNode);
 	abstract string CompileString(StringNode);
+	abstract string CompileBytes(BytesNode);
+	abstract string CompileAsm(AsmNode);
 }
 
 class Compiler {
@@ -64,6 +66,9 @@ class Compiler {
 			}
 			case NodeType.String: {
 				return backend.CompileString(cast(StringNode) node);
+			}
+			case NodeType.Asm: {
+				return backend.CompileAsm(cast(AsmNode) node);
 			}
 			default: assert(0);
 		}

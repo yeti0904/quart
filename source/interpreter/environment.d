@@ -173,6 +173,10 @@ class Environment {
 				variables[$ - 1][node.name] = (new ubyte[](node.size)).ptr;
 				break;
 			}
+			case NodeType.Asm: {
+				Error("Inline assembly is not available in the interpreter");
+				assert(0);
+			}
 			default: assert(0);
 		}
 	}

@@ -2,7 +2,14 @@ module quart.backends.rm86;
 
 import std.range;
 import std.format;
+import quart.util;
+import quart.lexer;
+import quart.parser;
 import quart.compiler;
+
+// tfw i java all over my code
+private static const auto primitiveLib = cast(string) import("primitives/rm86.qrt");
+// show this to a java programmer and they won't bat an eye
 
 private struct Word {
 	bool   builtIn;
@@ -21,52 +28,6 @@ class BackendRM86 : CompilerBackend {
 
 	this() {
 		variables ~= new Variable[string];
-
-		words["+"] = Word(
-			true,
-			"sub si, 2\n" ~
-			"mov bx, [si]\n" ~
-			"sub si, 2\n" ~
-			"mov ax, [si]\n" ~
-			"add ax, bx\n" ~
-			"mov [si], ax\n" ~
-			"add si, 2\n"
-		);
-		words["="] = Word(
-			true,
-			"sub si, 2\n" ~
-			"mov bx, [si]\n" ~
-			"sub si, 2\n" ~
-			"mov ax, [si]\n" ~
-			"cmp ax, bx\n" ~
-			"mov ax, 0\n" ~
-			"sete al, \n" ~
-			"mov [si], ax\n" ~
-			"add si, 2\n"
-		);
-		words["emit"] = Word(
-			true,
-			"sub si, 2\n" ~
-			"mov ax, [si]\n" ~
-			"mov ah, 0x0E\n" ~
-			"int 0x10\n"
-		);
-		words["@"] = Word(
-			true,
-			"sub si, 2\n" ~
-			"mov di, [si]\n" ~
-			"mov bx, [di]\n" ~
-			"mov [si], bx\n" ~
-			"add si, 2\n"
-		);
-		words["!"] = Word(
-			true,
-			"sub si, 2\n" ~
-			"mov di, [si]\n" ~
-			"sub si, 2\n" ~
-			"mov bx, [si]\n" ~
-			"mov [di], bx\n"
-		);
 	}
 
 	string CompileEndScope() {
@@ -80,7 +41,20 @@ class BackendRM86 : CompilerBackend {
 	}
 
 	override string Init() {
-		return "mov si, __end\nmov ax, cs\nmov ds, ax\n";
+		string ret = "mov si, __end\nmov ax, cs\nmov ds, ax\n";
+
+		// compile primitive library
+		Node[] primAST;
+		try {
+			primAST = ParseCode("<prim_rm86>", primitiveLib);
+		}
+		catch (ParserError) throw new CompilerError();
+
+		foreach (ref node ; primAST) {
+			ret ~= compiler.Compile(node);
+		}
+
+		return ret;
 	}
 
 	override string Finalise() {
@@ -95,7 +69,8 @@ class BackendRM86 : CompilerBackend {
 				return word.assembly;
 			}
 			else {
-				return format("call __func__%s\n", node.word);
+				auto labelName = FixLabel(node.word);
+				return format("call __func__%s\n", labelName);
 			}
 		}
 		else if (node.word in variables[$ - 1]) {
@@ -124,7 +99,8 @@ class BackendRM86 : CompilerBackend {
 	
 		words[node.name] = Word(false);
 
-		string ret = format("jmp __func_end__%s\n__func__%s:\n", node.name, node.name);
+		auto labelName = FixLabel(node.name);
+		string ret = format("jmp __func_end__%s\n__func__%s:\n", labelName, labelName);
 
 		foreach (ref inode ; node.contents) {
 			ret ~= compiler.Compile(inode);
@@ -132,7 +108,7 @@ class BackendRM86 : CompilerBackend {
 
 		variables = variables[0 .. $ - 1];
 
-		return ret ~ CompileEndScope() ~ format("ret\n__func_end__%s:\n", node.name);
+		return ret ~ CompileEndScope() ~ format("ret\n__func_end__%s:\n", labelName);
 	}
 
 	override string CompileIf(IfNode node) {
@@ -196,7 +172,15 @@ class BackendRM86 : CompilerBackend {
 		return format("sub sp, %d", node.size * 2);
 	}
 	
-	override string CompileString(StringNode) { // TODO
-		return "";
+	override string CompileString(StringNode node) { // TODO
+		assert(0);
+	}
+
+	override string CompileBytes(BytesNode node) { // TODO
+		assert(0);
+	}
+
+	override string CompileAsm(AsmNode node) {
+		return node.contents ~ '\n';
 	}
 }

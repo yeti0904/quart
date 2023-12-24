@@ -25,3 +25,4 @@ Compiler:
 - [X] Variables
 - [X] Arrays
 - [ ] Strings
+- [ ] Inline functions

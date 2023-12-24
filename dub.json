@@ -5,5 +5,8 @@
 	"copyright": "Copyright © 2023, yeti0904",
 	"description": "An RPN programming language",
 	"license": "MIT",
-	"name": "quart"
+	"name": "quart",
+	"dflags": [
+		"-J."
+	]
 }
