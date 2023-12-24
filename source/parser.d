@@ -262,6 +262,10 @@ class Parser {
 		ret.name     = tokens[i].contents;
 		ret.contents = ParseUntil(";");
 
+		if (ret.name.canFind("__")) {
+			Error("Word names can't have __ (double underscore) in them");
+		}
+
 		return ret;
 	}
 
