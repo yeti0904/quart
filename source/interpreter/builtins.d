@@ -33,9 +33,6 @@ Word[string] GetBuiltIns() {
 		auto lhs = env.Pop();
 		env.Push(lhs % rhs);
 	}, null);
-	ret["."] = Word(true, (Environment env) {
-		write(env.Pop());
-	}, null);
 	ret["="] = Word(true, (Environment env) {
 		auto rhs = env.Pop();
 		auto lhs = env.Pop();
@@ -94,9 +91,6 @@ Word[string] GetBuiltIns() {
 	});
 	ret["exit"] = Word(true, (Environment env) {
 		exit(cast(int) env.Pop());
-	});
-	ret["type"] = Word(true, (Environment env) {
-		writef("%s", (cast(char*) env.Pop()).fromStringz());
 	});
 	ret["cells"] = Word(true, (Environment env) {
 		env.Push(env.Pop() * 8);

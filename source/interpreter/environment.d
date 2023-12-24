@@ -9,6 +9,8 @@ import quart.error;
 import quart.parser;
 import quart.interpreter.builtins;
 
+private static const auto stdLib = cast(string) import("std/std.qrt");
+
 struct Word {
 	bool                       builtIn;
 	void function(Environment) func;
@@ -31,6 +33,14 @@ class Environment {
 	this() {
 		words      = GetBuiltIns();
 		variables ~= new void*[string];
+
+		Node[] stdNodes;
+		try {
+			stdNodes = ParseCode("<std lib>", stdLib);
+		}
+		catch (ParserError) throw new EnvironmentError();
+
+		InterpretNodes(stdNodes);
 	}
 
 	bool VariableExists(string name) {

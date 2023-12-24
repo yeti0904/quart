@@ -1,0 +1,23 @@
+: type
+	variable str
+	str !
+	variable ch
+	str @ C@ ch !
+
+	begin
+		ch @ emit
+		str @ 1 + str !
+		str @ C@ ch !
+	ch @ 0 = 0 = while
+;
+
+: ._loop
+  dup if
+    dup 10 / ._loop
+    10 % 48 + emit
+  else drop endif
+;
+
+: .
+  dup if ._loop else drop 48 emit endif
+;
