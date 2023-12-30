@@ -53,7 +53,7 @@ string FixLabel(string label) {
 			case '-':  ret ~= "__subtract__";    break;
 			case '_':  ret ~= "__underscore__";  break;
 			case '=':  ret ~= "__equals__";      break;
-			case '+':  ret ~= "__plush__";       break;
+			case '+':  ret ~= "__plus__";        break;
 			default:   ret ~= ch;
 		}
 	}

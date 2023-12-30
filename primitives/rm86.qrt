@@ -208,3 +208,5 @@ endasm ;
 : drop asm
 	sub si, 2
 endasm ;
+
+: cells 2 * ;

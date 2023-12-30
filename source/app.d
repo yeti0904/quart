@@ -4,9 +4,11 @@ import std.utf;
 import std.file;
 import std.array;
 import std.stdio;
+import quart.vm.vm;
 import quart.lexer;
 import quart.parser;
 import quart.compiler;
+import quart.vm.compiler;
 import quart.backends.rm86;
 import quart.interpreter.environment;
 
@@ -111,12 +113,18 @@ int main(string[] args) {
 				return 1;
 			}
 
+			auto          compiler = new VMCompiler();
+			Instruction[] program;
+			
 			try {
-				env.InterpretNodes(parser.ast);
+				program = compiler.CompileProgram(parser.ast);
 			}
-			catch (EnvironmentError) {
+			catch (VMCompilerError) {
 				return 1;
 			}
+
+			auto vm = new VM();
+			vm.ExecuteInsts(program);
 			return 0;
 		}
 		case AppMode.Compile: {

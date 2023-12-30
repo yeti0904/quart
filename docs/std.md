@@ -56,11 +56,6 @@ Returns -1 if `n1` < `n2`
 
 Returns -1 if `n1` <= `n2`
 
-## words
-`( -- )`
-
-Prints all defined words and the amount to stdout
-
 ## emit
 `( ch -- )`
 
@@ -105,16 +100,6 @@ Exits with exit code `n`
 `( n -- n*size )`
 
 Multiplies `n` by the cell size in bytes
-
-## r>
-`( -- n)`
-
-Pops from the return stack and puts the value on the stack
-
-## >r
-`( n -- )`
-
-Pops from the stack and pushes the value to the return stack
 
 ## swap
 `( n1 n2 -- n2 n1)`

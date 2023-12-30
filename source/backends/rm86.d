@@ -169,7 +169,7 @@ class BackendRM86 : CompilerBackend {
 		}
 
 		variables[$ - 1][node.name] = Variable(0, node.size);
-		return format("sub sp, %d", node.size * 2);
+		return format("sub sp, %d\n", node.size * 2);
 	}
 	
 	override string CompileString(StringNode node) { // TODO

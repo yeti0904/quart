@@ -12,12 +12,12 @@
 ;
 
 : ._loop
-  dup if
-    dup 10 / ._loop
-    10 % 48 + emit
-  else drop endif
+	dup if
+		dup 10 / ._loop
+		10 % 48 + emit
+	else drop endif
 ;
 
 : .
-  dup if ._loop else drop 48 emit endif
+	dup if ._loop else drop 48 emit endif
 ;
